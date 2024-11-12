@@ -22,9 +22,8 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
     height: 100vh;
-    margin: 0;
+    margin: 0 auto;
 }
 
 .container {
@@ -46,8 +45,10 @@ body {
 }
 
 .letter {
+    color: wheat;
     width: 50px;
-    height: 50px;
+    height: 40px;
     border: 1px solid #3d556e;
+    border-radius: 13px;
     box-shadow: 1px 1px 4px rgb(0, 0, 0, 0.3);
 }
