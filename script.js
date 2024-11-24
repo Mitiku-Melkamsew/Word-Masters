@@ -1,8 +1,9 @@
 const letters = document.querySelectorAll('.letter');
 const container = document.querySelector('.words')
 const loader = document.querySelector('.loader')
-const body = document.body
+const head = document.querySelector('.head')
 const WORD_LENGTH = 5;
+const numGuesses = 6;
 
 let currentGuess = "";
 let guess = 0;
@@ -17,11 +18,13 @@ async function init() {
     loading = false;
     hide()
     word = resj.word.toUpperCase();
-    if (!loading && !end) {
-        document.addEventListener('keydown', handleKeydown);
-    }
+    document.addEventListener('keydown', handleKeydown);
 }
 function handleKeydown(e) {
+    if (end || loading) {
+        // do nothing;
+        return;
+    }
     if (isLetter(e.key)) {
         addletter(e.key.toUpperCase());
     } else if (e.key === "Backspace") {
@@ -47,19 +50,27 @@ function back() {
 }
 
 async function validate(letter) {
+    if (letter.length !== WORD_LENGTH) {
+        // do nothing
+        return;
+    }
+    loading = true;
     const res = await fetch("https://words.dev-apis.com/validate-word", {
         method: "POST",
         body: JSON.stringify({ "word": letter }),
     });
     const { validWord } = await res.json();
-    if (guess < 5) {
+    loading = false;
+    if (guess < numGuesses) {
         if (validWord) {
             if (letter === word) {
                 for (let i = 0; i < WORD_LENGTH; i++) {
                     letters[guess * WORD_LENGTH + i].classList.add('correct');
                 }
-                container.classList.add('winning')
-                body.classList.add('winning')
+                setTimeout(() => {
+                    alert("YOU WIN! 🎉✨");
+                }, 100);
+                head.classList.add('winner')
                 end = true;
             } else {
                 const wordlist = word.split('');
@@ -108,10 +119,11 @@ async function validate(letter) {
 
 
         }
-    } else {
-        container.classList.add('lose');
+    }
+
+    if (guess === numGuesses) {
         setTimeout(() => {
-            alert("YOU LOSE");
+            alert("YOU LOSE! the word was " + word);
         }, 100);
         end = true;
     }
@@ -122,7 +134,7 @@ function show() {
 }
 
 function hide() {
-    loader.style.display = 'none';
+    loader.style.visibility = 'hidden';
 }
 
 function isLetter(letter) {
